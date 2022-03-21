@@ -2,7 +2,7 @@ import path from 'path';
 import { JSAnalyzer } from "@/analyzers";
 
 describe('JSAnalyzer', () => {
-  const filepath = "./src/__tests__/fixtures/js/simple.js.txt";
+  const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
 
   describe("analyze", () => {
     describe('when found', () => {
@@ -53,7 +53,7 @@ describe('JSAnalyzer', () => {
                 "  )",
               line: 13,
               start: 253,
-              end: 258,
+              end: 452,
               offset: 8,
             },
           ]);
