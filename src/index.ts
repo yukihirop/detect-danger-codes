@@ -1,7 +1,12 @@
-import { getLineInfo, Parser, Options } from "acorn";
+import { Parser, Options } from "acorn";
 import * as fs from 'fs'
 
+import { ISourceCodeWithPosition } from '@/interfaces'
 import { Analyzer } from "./analyzer";
+
+/**
+ * @see https://npmdoc.github.io/node-npmdoc-acorn/build/apidoc.html
+ */
 
 const acornOpions: Options = {
   ecmaVersion: 2022,
@@ -9,21 +14,19 @@ const acornOpions: Options = {
 }
 
 const js = fs.readFileSync('./examples/js/simple.js', { encoding: 'utf-8' })
-const parsed = Parser.parse(js, acornOpions);
-// console.log({ parsed, start: parsed.start, end: parsed.end })
-// console.log({ body: parsed.body })
-
-const parsedAt = Parser.parseExpressionAt(js, 259, acornOpions);
-console.log(parsedAt);
-console.log(Object.keys(parsedAt));
-
-const lineInfo = getLineInfo(js, 2)
-// console.log({js, lineInfo})
-
-const tokenizer = Parser.tokenizer(js, acornOpions)
-// console.log(tokenizer.getToken())
-
+const targetIterator = "map"
 const analyzer = new Analyzer(js)
-console.log({
-  info: analyzer.sourcePositionAt("Promise.all"),
-});
+const sourcePosition = analyzer.sourcePositionAt(targetIterator);
+sourcePosition.forEach((item) => {
+  const parsedAt = Parser.parseExpressionAt(js, item.start, acornOpions);
+  const { start, end } = parsedAt
+  const result: ISourceCodeWithPosition = {
+    target: targetIterator,
+    code: js.substring(start, end),
+    line: item.line,
+    start,
+    end,
+    offset: item.offset,
+  };
+  console.log(result);
+})

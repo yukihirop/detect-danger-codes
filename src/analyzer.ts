@@ -22,6 +22,7 @@ export class Analyzer {
         const isInclude = startIndex != -1;
         if (isInclude) {
           acc.push({
+            target: partial,
             line: index + 1,
             start: currentEndPosition,
             end: currentEndPosition + item.length + this.#NEW_LINE_COUNT,
