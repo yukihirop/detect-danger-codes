@@ -10,6 +10,7 @@
     "ddc": "./packages/core/bin/ddc"
   },
   "scripts": {
+    "build": "yarn workspaces run build",
     "eg:js": "yarn workspace @detect-danger-codes/core run eg:js",
     "test": "yarn workspaces run test"
   }
