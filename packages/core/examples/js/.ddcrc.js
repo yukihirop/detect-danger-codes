@@ -1,3 +1,3 @@
 module.exports = {
-  target: ['Promise.all']
+  target: ['await Promise.all']
 }

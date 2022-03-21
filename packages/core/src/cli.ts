@@ -44,7 +44,7 @@ export class DDCCli extends Command {
       const config = require(configPath || defaultConfigPath);
       return ddiRun(args.filename, config);
     } catch (err) {
-      console.error(err)
+      throw err
     }
   }
 }

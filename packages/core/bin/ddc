@@ -1,4 +1,8 @@
 #!/usr/bin/env node
 require('../index.js').DDCCli.run()
-  .then(result => console.log(result))
-  .catch(require('@oclif/errors/handle'))
+  .then(result => result && console.log(result))
+  .catch(err => {
+    console.error(err)
+    require('@oclif/errors/handle')(err)
+    process.exit(1)
+  })
