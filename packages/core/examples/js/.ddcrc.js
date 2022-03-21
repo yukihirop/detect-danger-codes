@@ -1,3 +1,3 @@
 module.exports = {
-  target: ['map']
+  target: ['Promise.all']
 }
