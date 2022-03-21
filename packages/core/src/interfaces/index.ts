@@ -1,2 +1,2 @@
 export * from './analyzer'
-export * from './option'
+export * from './config'

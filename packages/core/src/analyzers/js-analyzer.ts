@@ -23,13 +23,13 @@ export class JSAnalyzer {
   }
 
   public analyze(input: string): ISourceCodeWithPosition[] {
-    const target = this.config.iterators[0]
+    const target = this.config.target[0]
     const sourcePosition = this.sourcePositionAt(input, target)
     return sourcePosition.reduce((acc, item) => {
       const parsedAt = Parser.parseExpressionAt(input, item.start, acornOpions);
       const { start, end } = parsedAt;
       const result: ISourceCodeWithPosition = {
-        target: target,
+        target,
         code: input.substring(start, end),
         line: item.line,
         start,

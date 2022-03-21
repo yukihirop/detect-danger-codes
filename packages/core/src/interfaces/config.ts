@@ -1,3 +1,3 @@
 export interface IConfig {
-  iterators: string[]
+  target: string[]
 }

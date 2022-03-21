@@ -6,7 +6,7 @@ describe('JSAnalyzer', () => {
 
   describe("analyze", () => {
     describe('when found', () => {
-      const config = { iterators: ['map'] }
+      const config = { target: ['map'] }
       const analyzer = new JSAnalyzer(config)
       it('should return [{ target, code, line, start, end, offset }]', () => {
         expect(analyzer.analyze(input)).toStrictEqual(
@@ -32,7 +32,7 @@ describe('JSAnalyzer', () => {
     })
 
     describe("when do not found", () => {
-      const config = { iterators: ['do_not_exist'] }
+      const config = { target: ['do_not_exist'] }
       const analyzer = new JSAnalyzer(config)
       it('should return []', () => {
         expect(analyzer.analyze(input)).toStrictEqual([])
