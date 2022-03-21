@@ -1,25 +1,36 @@
 {
   "name": "detect-danger-iterators",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "esbuild --bundle --minify ./src/index.ts > ./dist/index.js",
+    "build": "node esbuild.js",
     "dev": "node --require esbuild-register ./src/index.ts",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "eg:js": "yarn build && node ./bin/ddi ./examples/js/simple.js -c ./examples/js/.ddirc.js"
   },
   "dependencies": {
-    "acorn": "^8.7.0"
+    "@oclif/command": "^1.8.16",
+    "acorn": "^8.7.0",
+    "pkg-dir": "^6.0.1"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
     "@types/node": "^17.0.21",
+    "@types/pkg-dir": "^2.0.1",
     "esbuild": "^0.14.27",
     "esbuild-jest": "^0.5.0",
     "esbuild-register": "^3.3.2",
     "jest": "^27.5.1",
+    "path-browserify": "^1.0.1",
     "ts-node": "^10.7.0",
     "tsc": "^2.0.4",
     "typescript": "^4.6.2"
+  },
+  "engines": {
+    "node": "v17"
   }
 }
