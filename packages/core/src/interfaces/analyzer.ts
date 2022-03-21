@@ -6,5 +6,6 @@ export interface ISourcePosition {
   offset: number
 }
 export interface ISourceCodeWithPosition extends ISourcePosition {
-  code: string
+  filepath: string;
+  code: string;
 }
