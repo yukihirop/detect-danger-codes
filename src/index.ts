@@ -1,1 +1,1 @@
-export { DDICli } from './cli'
+export { DDCCli } from './cli'

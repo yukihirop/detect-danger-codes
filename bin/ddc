@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-require('../index.js').DDICli.run()
+require('../index.js').DDCCli.run()
   .then(result => console.log(result))
   .catch(require('@oclif/errors/handle'))

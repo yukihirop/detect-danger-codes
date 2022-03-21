@@ -3,14 +3,14 @@ version: '3.8'
 services:
   mongo:
     image: mongo:4
-    container_name: detect-danger-iterators-mongo
+    container_name: detect-danger-codes-mongo
     volumes:
       - ./db:/data/db
     ports:
       - 27017:27017
   mongo-express:
     image: mongo-express
-    container_name: detect-danger-iterators-mongo-express
+    container_name: detect-danger-codes-mongo-express
     ports:
       - 8081:8081
     depends_on:

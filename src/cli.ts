@@ -6,13 +6,13 @@ import { run as ddiRun } from './runner'
 
 const projectRoot = packageDirectorySync() || process.cwd();
 const cwd = process.cwd();
-export class DDICli extends Command {
+export class DDCCli extends Command {
   /**
    * @bug don't ovverride usage
    * @see https://oclif.io/docs/commands#other-command-options
    */
   static usage = "ddi";
-  static description = "detect danger iterators";
+  static description = "detect danger codes";
 
   static flags = {
     help: flags.help({
@@ -21,7 +21,7 @@ export class DDICli extends Command {
     }),
     config: flags.string({
       char: "c",
-      description: ".ddirc.js",
+      description: ".ddcrc.js",
       required: false,
     }),
   };
@@ -35,9 +35,9 @@ export class DDICli extends Command {
   ]
 
   async run() {
-    const { args, flags } = this.parse(DDICli)
+    const { args, flags } = this.parse(DDCCli)
 
-    const defaultConfigPath = `${projectRoot}/.ddirc.js`
+    const defaultConfigPath = `${projectRoot}/.ddcrc.js`
     const configPath = `${cwd}/${flags.config}`
 
     try {

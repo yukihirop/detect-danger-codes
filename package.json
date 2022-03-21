@@ -1,5 +1,5 @@
 {
-  "name": "detect-danger-iterators",
+  "name": "detect-danger-codes",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
@@ -10,7 +10,7 @@
     "build": "node esbuild.js",
     "dev": "node --require esbuild-register ./src/index.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "eg:js": "yarn build && node ./bin/ddi ./examples/js/simple.js -c ./examples/js/.ddirc.js"
+    "eg:js": "yarn build && node ./bin/ddc ./examples/js/simple.js -c ./examples/js/.ddcrc.js"
   },
   "dependencies": {
     "@oclif/command": "^1.8.16",
