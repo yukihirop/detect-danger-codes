@@ -4,13 +4,14 @@
  */
 
 export default {
+  rootDir: "../..",
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: "coverage",
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@/(.*)$": "<rootDir>/packages/core/src/$1",
   },
   transform: {
-    "^.+\\.tsx?$": "esbuild-jest",
+    "^.+\\.tsx?$": "<rootDir>/node_modules/esbuild-jest",
   },
 };

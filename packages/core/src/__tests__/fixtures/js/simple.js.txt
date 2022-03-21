@@ -17,9 +17,9 @@ const insertTasks = async () => {
           title: `title_${index}`,
           content: `content_${index}`,
         },
-      ]);
+      ])
     })
-  );
+  )
 };
 
 mongoose
@@ -31,4 +31,4 @@ Promise.resolve(() => db.once("open"))
   .then(() => console.log("connection opened"))
   .then(() => insertTasks())
   .then(() => db.close())
-  .then(() => console.log("connection closed"));
+  .then(() => console.log('connection closed'));
