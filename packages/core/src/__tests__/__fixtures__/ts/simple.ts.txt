@@ -1,7 +1,16 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 mongoose.Promise = global.Promise;
+interface TaskField {
+  _id: string,
+  title: string,
+  content: string
+}
 
-const TaskSchema = new mongoose.Schema({
+type TaskDocument = mongoose.Document<mongoose.Types.ObjectId> & TaskField
+
+interface TaskModel extends mongoose.Model<TaskDocument> {}
+
+const TaskSchema = new mongoose.Schema<TaskDocument, TaskModel>({
   title: String,
   content: String,
 });
@@ -17,19 +26,18 @@ const insertTasks = async () => {
           title: `title_${index}`,
           content: `content_${index}`,
         },
-      ])
+      ]);
     })
-  )
+  );
 };
 
 mongoose
-  .connect("mongodb://localhost:27017/js")
+  .connect("mongodb://localhost:27017/ts")
   .catch((err) => console.error(err));
 const db = mongoose.connection;
 
-Promise.resolve(() => db.once("open"))
+Promise.resolve(() => db.once("open", () => {}))
   .then(() => console.log("connection opened"))
   .then(() => insertTasks())
   .then(() => db.close())
-  .then(() => console.log('connection closed'))
-  .catch(console.error);
+  .then(() => console.log("connection closed"));

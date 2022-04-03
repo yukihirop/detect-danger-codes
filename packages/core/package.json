@@ -10,7 +10,8 @@
     "build": "node esbuild.js",
     "dev": "node --require esbuild-register ./src/index.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "eg:js": "yarn build && node ./bin/ddc ./examples/js/simple.js -c ./examples/js/.ddcrc.js"
+    "eg:js": "yarn build && node ./bin/ddc ./examples/js/simple.js -c ./examples/js/.ddcrc.js",
+    "eg:ts": "yarn build && node ./bin/ddc ./examples/ts/simple.ts -c ./examples/ts/.ddcrc.js"
   },
   "dependencies": {
     "@oclif/command": "^1.8.16",

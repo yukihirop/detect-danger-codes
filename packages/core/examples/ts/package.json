@@ -1,0 +1,17 @@
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev:simple": "node --require esbuild-register simple.ts"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.97",
+    "esbuild": "^0.14.27",
+    "esbuild-register": "^3.3.2"
+  },
+  "dependencies": {
+    "mongoose": "^6.2.7"
+  }
+}

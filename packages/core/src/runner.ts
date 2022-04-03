@@ -1,13 +1,12 @@
-import { Parser, Options } from "acorn";
-import * as fs from 'fs'
 import path from 'path'
 
 import { ISourceCodeWithPosition, IConfig } from '@/interfaces'
-import { JSAnalyzer } from "./analyzers";
+import { JSAnalyzer, TSAnalyzer } from "./analyzers";
 import { validateConfig } from './validator'
 
 const Extname = {
-  JS: '.js'
+  JS: '.js',
+  TS: '.ts'
 }
 
 export const run = (filepath: string, config: IConfig): ISourceCodeWithPosition[] => {
@@ -16,9 +15,10 @@ export const run = (filepath: string, config: IConfig): ISourceCodeWithPosition[
 
   const extname = path.extname(filepath)
   if (extname === Extname.JS) {
-    const input = fs.readFileSync(filepath, { encoding: "utf-8" });
-    return new JSAnalyzer(config).analyze(input)
+    return new JSAnalyzer(config).analyze(filepath);
+  } else if (extname === Extname.TS) { 
+    return new TSAnalyzer(config).analyze(filepath);
   } else {
-    throw `[ddc] Do not support typescript: ${filepath}`
+    throw `[ddc] Do not support ${extname}: ${filepath}`
   }
 };

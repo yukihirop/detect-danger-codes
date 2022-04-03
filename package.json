@@ -12,6 +12,7 @@
   "scripts": {
     "build": "yarn workspaces run build",
     "eg:js": "yarn workspace @detect-danger-codes/core run eg:js",
+    "eg:ts": "yarn workspace @detect-danger-codes/core run eg:ts",
     "test": "yarn workspaces run test"
   }
 }

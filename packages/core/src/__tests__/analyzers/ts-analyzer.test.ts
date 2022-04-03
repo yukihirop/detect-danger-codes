@@ -1,15 +1,15 @@
-import path from 'path';
-import { JSAnalyzer } from "@/analyzers";
+import path from "path";
+import { TSAnalyzer } from "@/analyzers";
 
-describe('JSAnalyzer', () => {
-  const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
+describe("TSAnalyzer", () => {
+  const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
 
   describe("analyze", () => {
-    describe('when found', () => {
+    describe("when found", () => {
       describe("when `map`", () => {
-        const config = { target: ['map'] }
-        const analyzer = new JSAnalyzer(config)
-        it('should return [{ target, code, line, start, end, offset }]', () => {
+        const config = { target: ["map"] };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ target, code, line, start, end, offset }]", () => {
           expect(analyzer.analyze(filepath)).toStrictEqual([
             {
               filepath: path.resolve(process.cwd(), filepath),
@@ -21,21 +21,21 @@ describe('JSAnalyzer', () => {
                 "          title: `title_${index}`,\n" +
                 "          content: `content_${index}`,\n" +
                 "        },\n" +
-                "      ])\n" +
+                "      ]);\n" +
                 "    })",
-              line: 14,
-              start: 276,
-              end: 448,
+              line: 23,
+              start: 507,
+              end: 680,
               offset: 19,
             },
           ]);
-        })
-      })
+        });
+      });
 
       describe("when `Promise.all`", () => {
-        const config = { target: ['Promise.all'] }
-        const analyzer = new JSAnalyzer(config)
-        it('should return [{ target, code, line, start, end, offset }]', () => {
+        const config = { target: ["Promise.all"] };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ target, code, line, start, end, offset }]", () => {
           expect(analyzer.analyze(filepath)).toStrictEqual([
             {
               filepath: path.resolve(process.cwd(), filepath),
@@ -48,25 +48,25 @@ describe('JSAnalyzer', () => {
                 "          title: `title_${index}`,\n" +
                 "          content: `content_${index}`,\n" +
                 "        },\n" +
-                "      ])\n" +
+                "      ]);\n" +
                 "    })\n" +
                 "  )",
-              line: 13,
-              start: 253,
-              end: 452,
+              line: 22,
+              start: 484,
+              end: 684,
               offset: 8,
             },
           ]);
-        })
-      })
-    })
+        });
+      });
+    });
 
     describe("when do not found", () => {
-      const config = { target: ['do_not_exist'] }
-      const analyzer = new JSAnalyzer(config)
-      it('should return []', () => {
+      const config = { target: ["do_not_exist"] };
+      const analyzer = new TSAnalyzer(config);
+      it("should return []", () => {
         expect(analyzer.analyze(filepath)).toStrictEqual([]);
-      })
-    })
+      });
+    });
   });
-})
+});

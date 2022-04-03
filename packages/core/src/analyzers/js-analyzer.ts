@@ -1,4 +1,6 @@
 import { Parser, Options } from "acorn";
+import * as fs from "fs";
+import path from 'path';
 
 import { ISourcePosition, ISourceCodeWithPosition, IConfig } from "@/interfaces";
 
@@ -12,7 +14,6 @@ const acornOpions: Options = {
 }
 
 export class JSAnalyzer {
-  private input: string;
   private config: IConfig;
 
   #NEW_LINE_COUNT = 1
@@ -23,21 +24,24 @@ export class JSAnalyzer {
     this.config = config;
   }
 
-  public analyze(input: string): ISourceCodeWithPosition[] {
+  public analyze(filepath: string): ISourceCodeWithPosition[] {
     const target = this.config.target[0]
+    const input = fs.readFileSync(filepath, { encoding: "utf-8" });
     const sourcePosition = this.sourcePositionAt(input, target)
     return sourcePosition.reduce((acc, item) => {
       let parsedAt = Parser.parseExpressionAt(input, item.start, acornOpions);
-      const { start, end } = parsedAt;
+      let { start, end } = parsedAt;
       let code = input.substring(start, end)
 
       if (this.#RESERVED_CODES.includes(code)) {
         const awaitOrAsync = code
         parsedAt = Parser.parseExpressionAt(input, item.start + item.offset, acornOpions)
+        end = parsedAt.end
         code = awaitOrAsync + ' ' + input.substring(parsedAt.start, parsedAt.end)
       }
 
       const result: ISourceCodeWithPosition = {
+        filepath: path.resolve(process.cwd(), filepath),
         target,
         code,
         line: item.line,
