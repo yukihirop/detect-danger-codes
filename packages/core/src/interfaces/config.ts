@@ -1,3 +1,4 @@
+import { TSourcePositionMatches } from './analyzer'
 export interface IConfig {
-  target: string[]
+  matches: TSourcePositionMatches;
 }

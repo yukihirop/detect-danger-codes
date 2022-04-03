@@ -3,17 +3,29 @@ import { validateConfig } from '@/validator'
 describe('Validation', () => {
   describe('validateConfig', () => {
     describe('when valid `target`', () => {
-      const config = { target: ['Promise.all'] }
+      const config = {
+        matches: {
+          test: {
+            pattern: ['Promise.all', 'map', 'Task.create']
+          }
+        }
+      }
       it('success', () => {
-        expect(validateConfig(config)).toStrictEqual({ result: true, message: null })
+        expect(validateConfig(config)).toStrictEqual({ test: { result: true, message: null }})
       })
     })
 
     describe('when invalid `target`', () => {
-      const config = { target: ['await Promise.all'] }
+      const config = {
+        matches: {
+          test: {
+            pattern: ["await Promise.all", "map", "Task.create"],
+          },
+        },
+      };
       it('failure', () => {
         expect(validateConfig(config)).toStrictEqual(
-          {result: false, message: "[ddc] Invalid config.target: 'await Promise.all'. Cannot contain whitespace."})
+          { test: { result: false, message: "[ddc] Invalid config.matches[test].pattern: '[await Promise.all, map, Task.create]'. Cannot contain whitespace." } })
       })
     })
   })

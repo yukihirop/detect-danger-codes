@@ -1,9 +1,19 @@
-import { IConfig } from '@/interfaces'
+import { IConfig, TValidationMap } from '@/interfaces'
 
 const WHITE_SPACE = ' '
 
-export const validateConfig = (config: IConfig): { result: boolean, message: string | null } => {
-  const validTarget = config.target.every(item => !item.includes(WHITE_SPACE))
-  if(validTarget) return { result: true, message: null }
-  return { result: false, message: `[ddc] Invalid config.target: '${config.target}'. Cannot contain whitespace.` }
-}
+export const validateConfig = (config: IConfig): TValidationMap => {
+  return Object.keys(config.matches).reduce<TValidationMap>((acc, key) => {
+    const match = config.matches[key];
+    const isValid = match.pattern.every((item) => !item.includes(WHITE_SPACE));
+    if (isValid) {
+      acc[key] = { result: true, message: null };
+    } else {
+      acc[key] = {
+        result: false,
+        message: `[ddc] Invalid config.matches[${key}].pattern: '[${match.pattern.join(', ')}]'. Cannot contain whitespace.`,
+      };
+    }
+    return acc;
+  }, {});
+};
