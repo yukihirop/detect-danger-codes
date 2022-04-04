@@ -20,7 +20,7 @@
  * 
  */
 export interface ISourcePositionMatch {
-  pattern: string[],
+  pattern: (string | RegExp)[],
   description?: string
 }
 

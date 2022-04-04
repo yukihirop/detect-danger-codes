@@ -143,6 +143,58 @@ describe("TSAnalyzer", () => {
           });
         });
       });
+
+      describe("when `[Promise.all, map, /[a-zA-Z]+.create/]`", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          expect(analyzer.analyze(filepath)).toStrictEqual({
+            test: [
+              {
+                filepath: path.resolve(process.cwd(), filepath),
+                code:
+                  "Promise.all(\n" +
+                  "    [...Array(10)].map((_, index) => {\n" +
+                  "      return Task.create([\n" +
+                  "        {\n" +
+                  "          title: `title_${index}`,\n" +
+                  "          content: `content_${index}`,\n" +
+                  "        },\n" +
+                  "      ]);\n" +
+                  "    })\n" +
+                  "  )",
+                match: {
+                  pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+                },
+                matchInfo: {
+                  "Promise.all": {
+                    line: 22,
+                    position: 490,
+                  },
+                  map: {
+                    line: 23,
+                    position: 522,
+                  },
+                  "/[a-zA-Z]+.create/": {
+                    line: 24,
+                    position: 555,
+                  },
+                },
+                line: 22,
+                startPosition: 490,
+                endPosition: 684,
+                offsetPosition: 8,
+              },
+            ],
+          });
+        });
+      });
     });
 
     describe("when do not found", () => {

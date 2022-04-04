@@ -111,13 +111,19 @@ export class JSAnalyzer {
     let currentPos = 0;
     const matchInfo: TSourcePositionMatchInfo = {};
     for (const pattern of match.pattern) {
-      const result = input.indexOf(pattern, currentPos);
+      let result: number = -1
+      if (typeof pattern === 'string') {
+        result = input.indexOf(pattern, currentPos);
+      } else {
+        result = input.search(pattern);
+      }
+
       if (result === -1) {
         isMatch = false;
         break;
       } else {
         currentPos = result;
-        matchInfo[pattern] = { position: currentPos };
+        matchInfo[pattern.toString()] = { position: currentPos };
         isMatch = true;
       }
     }
@@ -146,7 +152,14 @@ export class JSAnalyzer {
     let currentEndPosition = 0;
     return inputArr.reduce((acc, item, index) => {
       const target = match.pattern[0];
-      const startIndex = item.indexOf(target);
+
+      let startIndex = -1
+      if (typeof target === 'string') {
+        startIndex = item.indexOf(target)
+      } else {
+        startIndex = item.search(target)
+      }
+
       if (item === this.#SPACE) {
         currentEndPosition += this.#NEW_LINE_COUNT;
       } else {
