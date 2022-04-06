@@ -1,8 +1,10 @@
+import { TSESTree } from "@typescript-eslint/typescript-estree";
+
 /**
  * @description
- * 
+ *
  * If you want to match `[Task.create] in [map] in [Promise.all]` with the following code,
- * 
+ *
  * await Promise.all(
  *   [...Array(10)].map((_, index) => {
  *     return Task.create([
@@ -13,20 +15,26 @@
  *     ]);
  *   })
  * );
- * 
+ *
  * write as follows:
- * 
+ *
  * pattern: ['Promise.all', 'map', 'Task.create']
- * 
+ *
  */
 export interface ISourcePositionMatch {
-  pattern: (string | RegExp)[],
-  description?: string
+  pattern: (string | RegExp)[];
+  description?: string;
 }
 
-export type TSourcePositionMatches = Record<string /* match identifier */, ISourcePositionMatch>
+export type TSourcePositionMatches = Record<
+  string /* match identifier */,
+  ISourcePositionMatch
+>;
 
-export type TSourcePositionMatchInfo = Record<string, { position: number, line?: number }>
+export type TSourcePositionMatchInfo = Record<
+  string,
+  { position: number; line?: number }
+>;
 export interface ISourcePosition {
   match: ISourcePositionMatch;
   matchInfo: TSourcePositionMatchInfo;
@@ -40,4 +48,11 @@ export interface ISourcePositionWithCode extends ISourcePosition {
   code: string;
 }
 
-export type TSourcePositionWithCodeMap = Record<string, ISourcePositionWithCode[]>
+export type TSourcePositionWithCodeMap = Record<
+  string,
+  ISourcePositionWithCode[]
+>;
+
+export interface IAnalyzer {
+  analyze(filepath: string): TSourcePositionWithCodeMap;
+}

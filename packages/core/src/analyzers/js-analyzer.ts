@@ -1,4 +1,4 @@
-import { Parser, Options } from "acorn";
+import acorn, { Parser, Options } from "acorn";
 import * as fs from "fs";
 import path from "path";
 
@@ -9,7 +9,8 @@ import {
   TSourcePositionMatches,
   ISourcePositionMatch,
   TSourcePositionMatchInfo,
-  TSourcePositionWithCodeMap
+  TSourcePositionWithCodeMap,
+  IAnalyzer,
 } from "@/interfaces";
 
 /**
@@ -21,8 +22,9 @@ const acornOpions: Options = {
   locations: true,
 };
 
-export class JSAnalyzer {
-  private config: IConfig;
+export class JSAnalyzer implements IAnalyzer {
+  protected config: IConfig;
+  protected parseExpressionAt: (input: string, position: number) => any;
 
   #NEW_LINE_COUNT = 1;
   #SPACE = "";
@@ -30,34 +32,35 @@ export class JSAnalyzer {
 
   constructor(config: IConfig) {
     this.config = config;
+    this.parseExpressionAt = (input: string, position: number) =>
+      Parser.parseExpressionAt(input, position, acornOpions) as acorn.Node;
   }
 
   public analyze(filepath: string): TSourcePositionWithCodeMap {
     const matches = this.config.matches;
     const input = fs.readFileSync(filepath, { encoding: "utf-8" });
     const sourcePositionMap = this.sourcePositionAt(input, matches);
+
     return Object.keys(sourcePositionMap).reduce<TSourcePositionWithCodeMap>(
       (acc, key) => {
         const sourcePosition = sourcePositionMap[key];
         const sorcePositionWithCodes = sourcePosition.reduce<
           ISourcePositionWithCode[]
-          >((childAcc, item) => {
-          let parsedAt = Parser.parseExpressionAt(
+        >((childAcc, item) => {
+          let parsedAt = this.parseExpressionAt(
             input,
-            item.startPosition + item.offsetPosition,
-            acornOpions
+            item.startPosition + item.offsetPosition
           );
+
           let { start, end } = parsedAt;
           let code = input.substring(start, end);
 
           if (this.#RESERVED_CODES.includes(code)) {
             const awaitOrAsync = code;
-            parsedAt = Parser.parseExpressionAt(
+            parsedAt = this.parseExpressionAt(
               input,
-              item.startPosition + item.offsetPosition,
-              acornOpions
+              item.startPosition + item.offsetPosition
             );
-
             end = parsedAt.end;
             code =
               awaitOrAsync +
@@ -111,8 +114,8 @@ export class JSAnalyzer {
     let currentPos = 0;
     const matchInfo: TSourcePositionMatchInfo = {};
     for (const pattern of match.pattern) {
-      let result: number = -1
-      if (typeof pattern === 'string') {
+      let result: number = -1;
+      if (typeof pattern === "string") {
         result = input.indexOf(pattern, currentPos);
       } else {
         result = input.search(pattern);
@@ -137,7 +140,8 @@ export class JSAnalyzer {
     const inputLineVSPos: number[] = new Array(inputArr.length).fill(0);
     inputLineVSPos[0] = inputArr[0].length + 1 /* \n */;
     for (let i = 1; i < inputArr.length; i++) {
-      inputLineVSPos[i] = inputArr[i].length + inputLineVSPos[i - 1] + 1 /* \n */;
+      inputLineVSPos[i] =
+        inputArr[i].length + inputLineVSPos[i - 1] + 1 /* \n */;
     }
 
     /**
@@ -153,11 +157,11 @@ export class JSAnalyzer {
     return inputArr.reduce((acc, item, index) => {
       const target = match.pattern[0];
 
-      let startIndex = -1
-      if (typeof target === 'string') {
-        startIndex = item.indexOf(target)
+      let startIndex = -1;
+      if (typeof target === "string") {
+        startIndex = item.indexOf(target);
       } else {
-        startIndex = item.search(target)
+        startIndex = item.search(target);
       }
 
       if (item === this.#SPACE) {
@@ -181,7 +185,10 @@ export class JSAnalyzer {
     }, [] as ISourcePosition[]);
   }
 
-  private lineBy(pos: number, lineVsEndPos: number[]): number /* line number */ {
+  private lineBy(
+    pos: number,
+    lineVsEndPos: number[]
+  ): number /* line number */ {
     let currentLine = 0;
     for (let i = 0; i <= lineVsEndPos.length; i++) {
       if (lineVsEndPos[i] <= pos && pos <= lineVsEndPos[i + 1]) {

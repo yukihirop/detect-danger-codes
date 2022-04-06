@@ -23,8 +23,8 @@ describe("TSAnalyzer", () => {
                 code:
                   "Task.create([\n" +
                   "        {\n" +
-                  "          title: `title_${index}`,\n" +
-                  "          content: `content_${index}`,\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
                   "        },\n" +
                   "      ])",
                 match: {
@@ -32,13 +32,13 @@ describe("TSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
-                    line: 24,
-                    position: 555,
+                    line: 25,
+                    position: 586,
                   },
                 },
-                line: 24,
+                line: 25,
                 startPosition: 555,
-                endPosition: 672,
+                endPosition: 723,
                 offsetPosition: 13,
               },
             ],
@@ -108,11 +108,12 @@ describe("TSAnalyzer", () => {
                 filepath: path.resolve(process.cwd(), filepath),
                 code:
                   "Promise.all(\n" +
-                  "    [...Array(10)].map((_, index) => {\n" +
+                  "    // @ts-expect-error\n" +
+                  "    [...Array(10)].map<any[]>((_, index) => {\n" +
                   "      return Task.create([\n" +
                   "        {\n" +
-                  "          title: `title_${index}`,\n" +
-                  "          content: `content_${index}`,\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
                   "        },\n" +
                   "      ]);\n" +
                   "    })\n" +
@@ -126,17 +127,17 @@ describe("TSAnalyzer", () => {
                     position: 490,
                   },
                   map: {
-                    line: 23,
-                    position: 522,
+                    line: 24,
+                    position: 546,
                   },
                   "Task.create": {
-                    line: 24,
-                    position: 555,
+                    line: 25,
+                    position: 586,
                   },
                 },
                 line: 22,
                 startPosition: 490,
-                endPosition: 684,
+                endPosition: 735,
                 offsetPosition: 8,
               },
             ],
@@ -160,11 +161,12 @@ describe("TSAnalyzer", () => {
                 filepath: path.resolve(process.cwd(), filepath),
                 code:
                   "Promise.all(\n" +
-                  "    [...Array(10)].map((_, index) => {\n" +
+                  "    // @ts-expect-error\n" +
+                  "    [...Array(10)].map<any[]>((_, index) => {\n" +
                   "      return Task.create([\n" +
                   "        {\n" +
-                  "          title: `title_${index}`,\n" +
-                  "          content: `content_${index}`,\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
                   "        },\n" +
                   "      ]);\n" +
                   "    })\n" +
@@ -178,17 +180,17 @@ describe("TSAnalyzer", () => {
                     position: 490,
                   },
                   map: {
-                    line: 23,
-                    position: 522,
+                    line: 24,
+                    position: 546,
                   },
                   "/[a-zA-Z]+.create/": {
-                    line: 24,
-                    position: 555,
+                    line: 25,
+                    position: 586,
                   },
                 },
                 line: 22,
                 startPosition: 490,
-                endPosition: 684,
+                endPosition: 735,
                 offsetPosition: 8,
               },
             ],
