@@ -6,66 +6,210 @@ describe("TSAnalyzer", () => {
 
   describe("analyze", () => {
     describe("when found", () => {
-      describe("when `map`", () => {
-        const config = { target: ["map"] };
-        const analyzer = new TSAnalyzer(config);
-        it("should return [{ target, code, line, start, end, offset }]", () => {
-          expect(analyzer.analyze(filepath)).toStrictEqual([
-            {
-              filepath: path.resolve(process.cwd(), filepath),
-              target: "map",
-              code:
-                "[...Array(10)].map((_, index) => {\n" +
-                "      return Task.create([\n" +
-                "        {\n" +
-                "          title: `title_${index}`,\n" +
-                "          content: `content_${index}`,\n" +
-                "        },\n" +
-                "      ]);\n" +
-                "    })",
-              line: 23,
-              start: 507,
-              end: 680,
-              offset: 19,
+      describe("when `[Task.create]`", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Task.create"],
             },
-          ]);
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          expect(analyzer.analyze(filepath)).toStrictEqual({
+            test: [
+              {
+                filepath: path.resolve(process.cwd(), filepath),
+                code:
+                  "Task.create([\n" +
+                  "        {\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
+                  "        },\n" +
+                  "      ]);",
+                match: {
+                  pattern: ["Task.create"],
+                },
+                matchInfo: {
+                  "Task.create": {
+                    line: 25,
+                    position: 586,
+                  },
+                },
+                line: 25,
+                startPosition: 586,
+                endPosition: 724,
+                offsetPosition: 13,
+              },
+            ],
+          });
         });
       });
 
-      describe("when `Promise.all`", () => {
-        const config = { target: ["Promise.all"] };
-        const analyzer = new TSAnalyzer(config);
-        it("should return [{ target, code, line, start, end, offset }]", () => {
-          expect(analyzer.analyze(filepath)).toStrictEqual([
-            {
-              filepath: path.resolve(process.cwd(), filepath),
-              target: "Promise.all",
-              code:
-                "await Promise.all(\n" +
-                "    [...Array(10)].map((_, index) => {\n" +
-                "      return Task.create([\n" +
-                "        {\n" +
-                "          title: `title_${index}`,\n" +
-                "          content: `content_${index}`,\n" +
-                "        },\n" +
-                "      ]);\n" +
-                "    })\n" +
-                "  )",
-              line: 22,
-              start: 484,
-              end: 684,
-              offset: 8,
+      describe("when `[map, Task.create]`", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["map", "Task.create"],
             },
-          ]);
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          expect(analyzer.analyze(filepath)).toStrictEqual({
+            test: [
+              {
+                filepath: path.resolve(process.cwd(), filepath),
+                code:
+                  "map<any[]>((_, index) => {\n" +
+                  "      return Task.create([\n" +
+                  "        {\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
+                  "        },\n" +
+                  "      ]);\n" +
+                  "    })",
+                match: {
+                  pattern: ["map", "Task.create"],
+                },
+                matchInfo: {
+                  "Task.create": {
+                    line: 25,
+                    position: 586,
+                  },
+                  map: {
+                    line: 24,
+                    position: 546,
+                  },
+                },
+                line: 24,
+                startPosition: 546,
+                endPosition: 731,
+                offsetPosition: 19,
+              },
+            ],
+          });
+        });
+      });
+
+      describe("when `[Promise.all, map, Task.create]`", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", "Task.create"],
+            },
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          expect(analyzer.analyze(filepath)).toStrictEqual({
+            test: [
+              {
+                filepath: path.resolve(process.cwd(), filepath),
+                code:
+                  "Promise.all(\n" +
+                  "    // @ts-expect-error\n" +
+                  "    [...Array(10)].map<any[]>((_, index) => {\n" +
+                  "      return Task.create([\n" +
+                  "        {\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
+                  "        },\n" +
+                  "      ]);\n" +
+                  "    })\n" +
+                  "  );",
+                match: {
+                  pattern: ["Promise.all", "map", "Task.create"],
+                },
+                matchInfo: {
+                  "Promise.all": {
+                    line: 22,
+                    position: 490,
+                  },
+                  map: {
+                    line: 24,
+                    position: 546,
+                  },
+                  "Task.create": {
+                    line: 25,
+                    position: 586,
+                  },
+                },
+                line: 22,
+                startPosition: 490,
+                endPosition: 736,
+                offsetPosition: 8,
+              },
+            ],
+          });
+        });
+      });
+
+      describe("when `[Promise.all, map, /[a-zA-Z]+.create/]`", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          expect(analyzer.analyze(filepath)).toStrictEqual({
+            test: [
+              {
+                filepath: path.resolve(process.cwd(), filepath),
+                code:
+                  "Promise.all(\n" +
+                  "    // @ts-expect-error\n" +
+                  "    [...Array(10)].map<any[]>((_, index) => {\n" +
+                  "      return Task.create([\n" +
+                  "        {\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
+                  "        },\n" +
+                  "      ]);\n" +
+                  "    })\n" +
+                  "  );",
+                match: {
+                  pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+                },
+                matchInfo: {
+                  "Promise.all": {
+                    line: 22,
+                    position: 490,
+                  },
+                  map: {
+                    line: 24,
+                    position: 546,
+                  },
+                  "/[a-zA-Z]+.create/": {
+                    line: 25,
+                    position: 586,
+                  },
+                },
+                line: 22,
+                startPosition: 490,
+                endPosition: 736,
+                offsetPosition: 8,
+              },
+            ],
+          });
         });
       });
     });
 
     describe("when do not found", () => {
-      const config = { target: ["do_not_exist"] };
+      const config = {
+        matches: {
+          test: {
+            pattern: ["do", "not", "exists"],
+          },
+        },
+      };
       const analyzer = new TSAnalyzer(config);
       it("should return []", () => {
-        expect(analyzer.analyze(filepath)).toStrictEqual([]);
+        expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
       });
     });
   });

@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { ISourceCodeWithPosition, IConfig } from '@/interfaces'
+import { TSourcePositionWithCodeMap, IConfig } from '@/interfaces'
 import { JSAnalyzer, TSAnalyzer } from "./analyzers";
 import { validateConfig } from './validator'
 
@@ -9,16 +9,19 @@ const Extname = {
   TS: '.ts'
 }
 
-export const run = (filepath: string, config: IConfig): ISourceCodeWithPosition[] => {
-  const { result, message } = validateConfig(config)
-  if(!result) throw message
+export const run = (filepath: string, config: IConfig): TSourcePositionWithCodeMap => {
+  const validationResult = validateConfig(config);
+  Object.keys(validationResult).forEach(key => {
+    const { result, message } = validationResult[key];
+    if (!result) throw message;
+  })
 
-  const extname = path.extname(filepath)
+  const extname = path.extname(filepath);
   if (extname === Extname.JS) {
     return new JSAnalyzer(config).analyze(filepath);
-  } else if (extname === Extname.TS) { 
+  } else if (extname === Extname.TS) {
     return new TSAnalyzer(config).analyze(filepath);
   } else {
-    throw `[ddc] Do not support ${extname}: ${filepath}`
+    throw `[ddc] Do not support ${extname}: ${filepath}`;
   }
 };

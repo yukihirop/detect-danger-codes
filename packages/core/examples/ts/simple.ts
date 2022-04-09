@@ -20,11 +20,12 @@ const Task = mongoose.model("Task", TaskSchema);
 // comment
 const insertTasks = async () => {
   await Promise.all(
-    [...Array(10)].map((_, index) => {
+    // @ts-expect-error
+    [...Array(10)].map<any[]>((_, index) => {
       return Task.create([
         {
-          title: `title_${index}`,
-          content: `content_${index}`,
+          title: `title_${index}` as string,
+          content: `content_${index}` as string,
         },
       ]);
     })

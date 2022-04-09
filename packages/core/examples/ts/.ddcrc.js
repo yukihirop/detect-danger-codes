@@ -1,3 +1,9 @@
 module.exports = {
-  target: ["Promise.all"],
+  matches: {
+    maybeHeabyQuery: {
+      pattern: ["map", "Task.create"],
+      // pattern: ['Promise.resolve'],
+      description: "maybe heavy query",
+    },
+  },
 };
