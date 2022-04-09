@@ -24,7 +24,11 @@ const acornOpions: Options = {
 
 export class JSAnalyzer implements IAnalyzer {
   protected config: IConfig;
-  protected parseExpressionAt: (input: string, position: number) => any;
+  protected parseExpressionAt: (
+    input: string,
+    position: number,
+    inputLineVSPos: number[]
+  ) => any;
 
   #NEW_LINE_COUNT = 1;
   #SPACE = "";
@@ -32,14 +36,33 @@ export class JSAnalyzer implements IAnalyzer {
 
   constructor(config: IConfig) {
     this.config = config;
-    this.parseExpressionAt = (input: string, position: number) =>
-      Parser.parseExpressionAt(input, position, acornOpions) as acorn.Node;
+    this.parseExpressionAt = (
+      input: string,
+      position: number,
+      _inputLineVSPos: number[]
+    ) => Parser.parseExpressionAt(input, position, acornOpions) as acorn.Node;
   }
 
   public analyze(filepath: string): TSourcePositionWithCodeMap {
     const matches = this.config.matches;
     const input = fs.readFileSync(filepath, { encoding: "utf-8" });
-    const sourcePositionMap = this.sourcePositionAt(input, matches);
+
+    /**
+     * Cumulative sum of each line of input
+     */
+    const inputArr = input.split("\n");
+    const inputLineVSPos: number[] = new Array(inputArr.length).fill(0);
+    inputLineVSPos[0] = inputArr[0].length + 1 /* \n */;
+    for (let i = 1; i < inputArr.length; i++) {
+      inputLineVSPos[i] =
+        inputArr[i].length + inputLineVSPos[i - 1] + 1 /* \n */;
+    }
+
+    const sourcePositionMap = this.sourcePositionAt(
+      input,
+      matches,
+      inputLineVSPos
+    );
 
     return Object.keys(sourcePositionMap).reduce<TSourcePositionWithCodeMap>(
       (acc, key) => {
@@ -49,7 +72,8 @@ export class JSAnalyzer implements IAnalyzer {
         >((childAcc, item) => {
           let parsedAt = this.parseExpressionAt(
             input,
-            item.startPosition + item.offsetPosition
+            item.startPosition + item.offsetPosition,
+            inputLineVSPos
           );
 
           let { start, end } = parsedAt;
@@ -59,7 +83,8 @@ export class JSAnalyzer implements IAnalyzer {
             const awaitOrAsync = code;
             parsedAt = this.parseExpressionAt(
               input,
-              item.startPosition + item.offsetPosition
+              item.startPosition + item.offsetPosition,
+              []
             );
             end = parsedAt.end;
             code =
@@ -91,11 +116,16 @@ export class JSAnalyzer implements IAnalyzer {
 
   private sourcePositionAt(
     input: string,
-    matches: TSourcePositionMatches
+    matches: TSourcePositionMatches,
+    inputLineVSPos: number[]
   ): Record<string /* match identifier (key) */, ISourcePosition[]> {
     return Object.keys(matches).reduce<Record<string, ISourcePosition[]>>(
       (acc, key) => {
-        const result = this.sourcePositionAtByPattern(input, matches[key]);
+        const result = this.sourcePositionAtByPattern(
+          input,
+          matches[key],
+          inputLineVSPos
+        );
         acc[key] = result;
         return acc;
       },
@@ -105,7 +135,8 @@ export class JSAnalyzer implements IAnalyzer {
 
   private sourcePositionAtByPattern(
     input: string,
-    match: ISourcePositionMatch
+    match: ISourcePositionMatch,
+    inputLineVSPos: number[]
   ): ISourcePosition[] {
     /**
      * Offset when matching or matching
@@ -134,17 +165,6 @@ export class JSAnalyzer implements IAnalyzer {
     if (!isMatch) return [];
 
     /**
-     * Cumulative sum of each line of input
-     */
-    const inputArr = input.split("\n");
-    const inputLineVSPos: number[] = new Array(inputArr.length).fill(0);
-    inputLineVSPos[0] = inputArr[0].length + 1 /* \n */;
-    for (let i = 1; i < inputArr.length; i++) {
-      inputLineVSPos[i] =
-        inputArr[i].length + inputLineVSPos[i - 1] + 1 /* \n */;
-    }
-
-    /**
      * Identify the number of lines from position
      */
     Object.keys(matchInfo).forEach((key) => {
@@ -153,6 +173,7 @@ export class JSAnalyzer implements IAnalyzer {
       matchInfo[key].line = line;
     });
 
+    const inputArr = input.split("\n");
     let currentEndPosition = 0;
     return inputArr.reduce((acc, item, index) => {
       const target = match.pattern[0];

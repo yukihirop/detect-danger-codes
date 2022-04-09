@@ -3,49 +3,95 @@ import flatten from 'flat'
 
 import { IParserOptions, IParsedNode } from "@/interfaces";
 
+type Range = [number, number]
+type RangeMap = {
+  [startPostion: number]: {
+    [rangeLength: number]: Range
+  }
+}
 export class TSParser {
-  static parseExpressionAt(code: string, position: number, options: IParserOptions): IParsedNode {
+  static parseExpressionAt(code: string, position: number, inputLineVSPos: number[], options: IParserOptions): IParsedNode {
     const ast = parse(code, options)
 
     let startPositions: number[] = []
     const flatBody: Record<string, any> = flatten(ast.body)
-    const rangeMap = Object.keys(flatBody).reduce<Record<number /* startPosition */, [number, number] /* range */>>(
-      (acc, key) => {
-        if (key.endsWith('range.0')) {
-          const nextKey = key.replace(/.0$/, '.1')
-          const range: [number, number] = [flatBody[key], flatBody[nextKey]]
-          startPositions.push(range[0])
-          acc[range[0]] = range
-        } else if (key.endsWith('range.1')) {
-          const prevKey = key.replace(/.1$/, '.0')
-          const range: [number, number] = [flatBody[prevKey], flatBody[key]]
-          startPositions.push(range[0])
-          acc[range[0]] = range
+    const rangeMap = Object.keys(flatBody).reduce<RangeMap>((acc, key) => {
+      if (key.endsWith("range.0")) {
+        const nextKey = key.replace(/.0$/, ".1");
+        const range: [number, number] = [flatBody[key], flatBody[nextKey]];
+        const rangeLen = range[1] - range[0];
+        startPositions.push(range[0]);
+        if (acc[range[0]]) {
+          acc[range[0]][rangeLen] = range
+        } else {
+          acc[range[0]] = { [rangeLen]: range }
         }
-        return acc
-      }, {})
+      } else if (key.endsWith("range.1")) {
+        const prevKey = key.replace(/.1$/, ".0");
+        const range: [number, number] = [flatBody[prevKey], flatBody[key]];
+        const rangeLen = range[1] - range[0];
+        startPositions.push(range[0]);
+        if (acc[range[0]]) {
+          acc[range[0]][rangeLen] = range;
+        } else {
+          acc[range[0]] = { [rangeLen]: range };
+        }
+      }
+      return acc;
+    }, {});
     
-    let foundRange: [number, number] = [0, 0];
     startPositions = startPositions.sort((a, b) => a - b);
-    for (let i = 0; i < startPositions.length; i++) {
-      const prevStartPosition = i >= 1 ? startPositions[i - 1] : 0
-      let startPosition = startPositions[i]
-      const nextStartPosition = i <= startPositions.length ? startPositions[i + 1] : 0
-      
-      if (prevStartPosition <= position && position < startPosition) {
-        foundRange = rangeMap[prevStartPosition];
-      } else if (position === startPosition) {
-        foundRange = rangeMap[startPosition];
-      } else if (startPosition < position && position <= nextStartPosition) {
-        foundRange = rangeMap[nextStartPosition];
+
+    let startPositionInLine = position
+    for (let i = 0; i < inputLineVSPos.length; i++) {
+      if (inputLineVSPos[i] <= position && position < inputLineVSPos[i + 1]) {
+        startPositionInLine = inputLineVSPos[i]
       } else {
         continue
       }
     }
 
+    const foundRange = this.#searchMaxRange(position, startPositionInLine, rangeMap)
+
+    //  ↓ foundRange[0]
+    //  ↓              ↓ position
+    //  ↓              ↓
+    // '[...Array(10)].map<any[]>((_, index) => {\n' +
+    // '      return Task.create([\n' +
+    // '        {\n' +
+    // '          title: `title_${index}` as string,\n' +
+    // '          content: `content_${index}` as string,\n' +
+    // '        },\n' +
+    // '      ]);\n' +
+    // '    })',
+    //        ↑
+    //        ↑ foundRange[0]
+
     return {
-      start: foundRange[0],
-      end: foundRange[1]
-    }
+      start: position,
+      end: foundRange[1],
+    };
+  }
+
+  static #searchMaxRange(position: number, startPositionInLine: number, rangeMap: RangeMap): Range {
+    const startPostions = Object.keys(rangeMap).map(Number)
+    const searchTargetStartPositions = startPostions.reduce<number[]>((acc, currentPos) => {
+      if (startPositionInLine <= currentPos && currentPos <= position) {
+        acc.push(currentPos)
+      }
+      return acc
+    }, [])
+
+    let foundstartPosition = position
+    let foundMaxLen = 0
+    searchTargetStartPositions.forEach(key => {
+      const newMaxLen = Math.max(...Object.keys(rangeMap[key]).map(Number));
+      if (foundMaxLen < newMaxLen) {
+        foundstartPosition = key;
+        foundMaxLen = newMaxLen;
+      }
+    })
+
+    return rangeMap[foundstartPosition][foundMaxLen]
   }
 }

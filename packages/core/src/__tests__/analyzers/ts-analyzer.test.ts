@@ -26,7 +26,7 @@ describe("TSAnalyzer", () => {
                   "          title: `title_${index}` as string,\n" +
                   "          content: `content_${index}` as string,\n" +
                   "        },\n" +
-                  "      ])",
+                  "      ]);",
                 match: {
                   pattern: ["Task.create"],
                 },
@@ -37,8 +37,8 @@ describe("TSAnalyzer", () => {
                   },
                 },
                 line: 25,
-                startPosition: 555,
-                endPosition: 723,
+                startPosition: 586,
+                endPosition: 724,
                 offsetPosition: 13,
               },
             ],
@@ -61,11 +61,11 @@ describe("TSAnalyzer", () => {
               {
                 filepath: path.resolve(process.cwd(), filepath),
                 code:
-                  "map((_, index) => {\n" +
+                  "map<any[]>((_, index) => {\n" +
                   "      return Task.create([\n" +
                   "        {\n" +
-                  "          title: `title_${index}`,\n" +
-                  "          content: `content_${index}`,\n" +
+                  "          title: `title_${index}` as string,\n" +
+                  "          content: `content_${index}` as string,\n" +
                   "        },\n" +
                   "      ]);\n" +
                   "    })",
@@ -74,17 +74,17 @@ describe("TSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
-                    line: 24,
-                    position: 555,
+                    line: 25,
+                    position: 586,
                   },
                   map: {
-                    line: 23,
-                    position: 522,
+                    line: 24,
+                    position: 546,
                   },
                 },
-                line: 23,
-                startPosition: 522,
-                endPosition: 680,
+                line: 24,
+                startPosition: 546,
+                endPosition: 731,
                 offsetPosition: 19,
               },
             ],
@@ -117,7 +117,7 @@ describe("TSAnalyzer", () => {
                   "        },\n" +
                   "      ]);\n" +
                   "    })\n" +
-                  "  )",
+                  "  );",
                 match: {
                   pattern: ["Promise.all", "map", "Task.create"],
                 },
@@ -137,7 +137,7 @@ describe("TSAnalyzer", () => {
                 },
                 line: 22,
                 startPosition: 490,
-                endPosition: 735,
+                endPosition: 736,
                 offsetPosition: 8,
               },
             ],
@@ -170,7 +170,7 @@ describe("TSAnalyzer", () => {
                   "        },\n" +
                   "      ]);\n" +
                   "    })\n" +
-                  "  )",
+                  "  );",
                 match: {
                   pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
                 },
@@ -190,7 +190,7 @@ describe("TSAnalyzer", () => {
                 },
                 line: 22,
                 startPosition: 490,
-                endPosition: 735,
+                endPosition: 736,
                 offsetPosition: 8,
               },
             ],
