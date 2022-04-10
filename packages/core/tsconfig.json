@@ -8,6 +8,13 @@
     "strict": true,                                      /* Enable all strict type-checking options. */
     "paths": {
       "@/*": ["./src/*"]
-    }
-  }
+    },
+    "declaration": true,
+  },
+  "exclude": [
+    "node_modules",
+    "examples", 
+    "jest.config.ts",
+    "*/__tests__"
+  ]
 }
