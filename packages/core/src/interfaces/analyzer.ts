@@ -38,7 +38,7 @@ export type TSourcePositionMatchInfo = Record<
 export interface ISourcePosition {
   match: ISourcePositionMatch;
   matchInfo: TSourcePositionMatchInfo;
-  line: number;
+  startLine: number;
   startPosition: number;
   endPosition: number;
   offsetPosition: number;
@@ -46,6 +46,7 @@ export interface ISourcePosition {
 export interface ISourcePositionWithCode extends ISourcePosition {
   filepath: string;
   code: string;
+  endLine: number;
 }
 
 export type TSourcePositionWithCodeMap = Record<

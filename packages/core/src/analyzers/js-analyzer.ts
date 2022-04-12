@@ -98,7 +98,8 @@ export class JSAnalyzer implements IAnalyzer {
             code,
             match: item.match,
             matchInfo: item.matchInfo,
-            line: item.line,
+            startLine: item.startLine,
+            endLine: item.startLine + code.split('\n').length,
             startPosition: start,
             endPosition: end,
             offsetPosition: item.offsetPosition,
@@ -175,7 +176,7 @@ export class JSAnalyzer implements IAnalyzer {
 
     const inputArr = input.split("\n");
     let currentEndPosition = 0;
-    return inputArr.reduce((acc, item, index) => {
+    return inputArr.reduce<ISourcePosition[]>((acc, item, index) => {
       const target = match.pattern[0];
 
       let startIndex = -1;
@@ -193,7 +194,7 @@ export class JSAnalyzer implements IAnalyzer {
           acc.push({
             match,
             matchInfo,
-            line: index + 1,
+            startLine: index + 1,
             startPosition: currentEndPosition,
             endPosition:
               currentEndPosition + item.length + this.#NEW_LINE_COUNT,
@@ -203,7 +204,7 @@ export class JSAnalyzer implements IAnalyzer {
         currentEndPosition += item.length + this.#NEW_LINE_COUNT;
       }
       return acc;
-    }, [] as ISourcePosition[]);
+    }, []);
   }
 
   private lineBy(
