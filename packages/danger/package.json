@@ -1,0 +1,26 @@
+{
+  "name": "@detect-danger-codes/danger",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "shx rm -rf dist",
+    "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly && tsc-alias"
+  },
+  "devDependencies": {
+    "danger": "^11.0.2",
+    "esbuild": "^0.14.34",
+    "esbuild-plugin-alias": "^0.2.1",
+    "shx": "^0.3.4",
+    "tsc-alias": "^1.6.6"
+  },
+  "engines": {
+    "node": "v17"
+  },
+  "dependencies": {
+    "git-root-dir": "^1.0.2"
+  }
+}

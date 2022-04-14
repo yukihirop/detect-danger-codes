@@ -36,8 +36,5 @@
     "tsc": "^2.0.4",
     "tsc-alias": "^1.6.6",
     "typescript": "^4.6.2"
-  },
-  "engines": {
-    "node": "v17"
   }
 }
