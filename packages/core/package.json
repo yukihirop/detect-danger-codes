@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "clean": "shx rm -rf dist",
-    "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly --outDir dist",
+    "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
     "dev": "node --require esbuild-register ./src/index.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "eg:js": "yarn build && node ./bin/ddc ./examples/js/simple.js -c ./examples/js/.ddcrc.js",
@@ -34,6 +34,7 @@
     "shx": "^0.3.4",
     "ts-node": "^10.7.0",
     "tsc": "^2.0.4",
+    "tsc-alias": "^1.6.6",
     "typescript": "^4.6.2"
   },
   "engines": {
