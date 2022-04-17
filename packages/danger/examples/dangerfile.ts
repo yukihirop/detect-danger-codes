@@ -3,7 +3,11 @@ import { checkDangerCodes } from "../dist";
 
 async function main() {
   message("hello danger");
-  const result = await checkDangerCodes(/^(?!dangerfile).*\.(ts)/, './.ddcrc.js');
+  const result = await checkDangerCodes("./.ddcrc.js", 
+    '!dangerfile.ts',
+    '!**/*.test.ts',
+    '**/*.{js,ts}'
+  );
   result.forEach(({ key, filepath, line }) => {
     if (key === "maybeHeabyQuery") {
       warn(

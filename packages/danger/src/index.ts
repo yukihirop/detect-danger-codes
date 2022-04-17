@@ -1,7 +1,9 @@
 import { run as runDDC } from "@detect-danger-codes/core";
 import path from 'path'
 import gitRootDir from "git-root-dir";
-import { DDCDangerResult } from "@/interfaces";
+import minimatch from 'minimatch';
+
+import { IDDCDangerResult, TMinimatchGlobPattern } from "@/interfaces";
 
 // Provides dev-time type structures for  `danger` - doesn't affect runtime.
 import { DangerDSLType } from "@@danger";
@@ -9,16 +11,21 @@ declare var danger: DangerDSLType;
 
 const cwd = process.cwd();
 
-export async function checkDangerCodes(pattern: RegExp, configPath: string): Promise<DDCDangerResult[]> {
-  const rootDir = await gitRootDir()
+export async function checkDangerCodes(
+  configPath: string,
+  ...pattern: TMinimatchGlobPattern
+): Promise<IDDCDangerResult[]> {
+  const rootDir = await gitRootDir();
   const files = [...danger.git.modified_files, ...danger.git.created_files];
-  const targetFiles = files.filter((filepath) => filepath.match(pattern));
+  const targetFiles = files.filter((filepath) => {
+    return pattern.every((globPattern) => minimatch(filepath, globPattern));
+  });
   const modifiedLine: Record<string, Set<number>> = {};
   const hitLineMap: Record<
     string /* key */,
     Record<string /* file of danger */, Set<number>>
-    > = {};
-  
+  > = {};
+
   for (const file of targetFiles) {
     if (!modifiedLine[file]) {
       modifiedLine[file] = new Set();
@@ -35,8 +42,8 @@ export async function checkDangerCodes(pattern: RegExp, configPath: string): Pro
         });
       });
     }
-    const absConfigPath = path.resolve(cwd, configPath)
-    const absFilePath = path.resolve(rootDir, file)
+    const absConfigPath = path.resolve(cwd, configPath);
+    const absFilePath = path.resolve(rootDir, file);
     const result = runDDC(absFilePath, require(absConfigPath));
     Object.keys(result).forEach((key) => {
       const items = result[key];
@@ -49,11 +56,10 @@ export async function checkDangerCodes(pattern: RegExp, configPath: string): Pro
           hitLineMap[key][file] = new Set<number>();
         }
 
-        const lineIter = modifiedLine[file].values()
+        const lineIter = modifiedLine[file].values();
         for (let i = 0; i < modifiedLine[file].size; i++) {
-          const line = lineIter.next().value
-
-          if (item.startLine <= line && line <= item.endLine) {
+          const line = lineIter.next().value;
+          if (line === item.matchLine) {
             hitLineMap[key][file].add(line);
           }
         }
@@ -61,7 +67,7 @@ export async function checkDangerCodes(pattern: RegExp, configPath: string): Pro
     });
   }
 
-  return Object.keys(hitLineMap).reduce<DDCDangerResult[]>((acc, key) => {
+  return Object.keys(hitLineMap).reduce<IDDCDangerResult[]>((acc, key) => {
     Object.keys(hitLineMap[key]).forEach((filepath) => {
       hitLineMap[key][filepath].forEach((line) => {
         acc.push({ key, filepath, line });
