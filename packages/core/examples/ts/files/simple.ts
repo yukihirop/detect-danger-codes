@@ -30,6 +30,7 @@ const User = mongoose.model("User", UserSchema)
 
 const insertUsers = async () => {
   await Promise.all(
+    // @ts-expect-error
     [...Array(10)].map<any[]>((_, index) => {
       return User.create([
         {

@@ -11,8 +11,10 @@
     "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
     "dev": "node --require esbuild-register ./src/index.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "eg:js": "yarn build && node ./bin/ddc ./examples/js/simple.js -c ./examples/js/.ddcrc.js",
-    "eg:ts": "yarn build && node ./bin/ddc ./examples/ts/simple.ts -c ./examples/ts/.ddcrc.js"
+    "eg:js:1": "yarn build && node ./bin/ddc ./examples/js/files/simple.js -c ./examples/js/.ddcrc.js",
+    "eg:js:2": "yarn build && node ./bin/ddc ./examples/js/files/export-only.js -c ./examples/js/.ddcrc.js",
+    "eg:ts:1": "yarn build && node ./bin/ddc ./examples/ts/files/simple.ts -c ./examples/ts/.ddcrc.js",
+    "eg:ts:2": "yarn build && node ./bin/ddc ./examples/ts/files/export-only.ts -c ./examples/ts/.ddcrc.js"
   },
   "dependencies": {
     "@oclif/command": "^1.8.16",
@@ -38,6 +40,6 @@
     "typescript": "^4.6.2"
   },
   "engines": {
-    "node": "v17"
+    "node": ">=14.19.0"
   }
 }

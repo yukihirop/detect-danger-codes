@@ -53,27 +53,35 @@ export class TSParser {
 
     const foundRange = this.#searchMaxRange(position, startPositionInLine, rangeMap)
 
-    //  ↓ foundRange[0]
-    //  ↓              ↓ position
-    //  ↓              ↓
-    // '[...Array(10)].map<any[]>((_, index) => {\n' +
-    // '      return Task.create([\n' +
-    // '        {\n' +
-    // '          title: `title_${index}` as string,\n' +
-    // '          content: `content_${index}` as string,\n' +
-    // '        },\n' +
-    // '      ]);\n' +
-    // '    })',
-    //        ↑
-    //        ↑ foundRange[0]
+    if (foundRange[0] === 0 && foundRange[1] === 0) {
+      return {
+        start: foundRange[0],
+        end: foundRange[1],
+      }
+    } else {
+      //  ↓ foundRange[0]
+      //  ↓              ↓ position
+      //  ↓              ↓
+      // '[...Array(10)].map<any[]>((_, index) => {\n' +
+      // '      return Task.create([\n' +
+      // '        {\n' +
+      // '          title: `title_${index}` as string,\n' +
+      // '          content: `content_${index}` as string,\n' +
+      // '        },\n' +
+      // '      ]);\n' +
+      // '    })',
+      //        ↑
+      //        ↑ foundRange[0]
 
-    return {
-      start: position,
-      end: foundRange[1],
-    };
+      return {
+        start: position,
+        end: foundRange[1],
+      };
+    }
   }
 
   static #searchMaxRange(position: number, startPositionInLine: number, rangeMap: RangeMap): Range {
+    const defaultRange: Range = [0, 0]
     const startPostions = Object.keys(rangeMap).map(Number)
     const searchTargetStartPositions = startPostions.reduce<number[]>((acc, currentPos) => {
       if (startPositionInLine <= currentPos && currentPos <= position) {
@@ -92,6 +100,10 @@ export class TSParser {
       }
     })
 
-    return rangeMap[foundstartPosition][foundMaxLen]
+    if (rangeMap[foundstartPosition]) {
+      return rangeMap[foundstartPosition][foundMaxLen];
+    } else {
+      return defaultRange
+    }
   }
 }

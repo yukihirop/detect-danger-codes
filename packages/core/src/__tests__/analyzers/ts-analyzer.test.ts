@@ -2,8 +2,6 @@ import path from "path";
 import { TSAnalyzer } from "@/analyzers";
 
 describe("TSAnalyzer", () => {
-  const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
-
   describe("analyze", () => {
     describe("when found", () => {
       describe("when `[Task.create]`", () => {
@@ -16,6 +14,7 @@ describe("TSAnalyzer", () => {
         };
         const analyzer = new TSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -57,6 +56,7 @@ describe("TSAnalyzer", () => {
         };
         const analyzer = new TSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -104,6 +104,7 @@ describe("TSAnalyzer", () => {
         };
         const analyzer = new TSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -158,6 +159,7 @@ describe("TSAnalyzer", () => {
         };
         const analyzer = new TSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -204,17 +206,35 @@ describe("TSAnalyzer", () => {
     });
 
     describe("when do not found", () => {
-      const config = {
-        matches: {
-          test: {
-            pattern: ["do", "not", "exists"],
+      describe("when do not match pattern", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["do", "not", "exists"],
+            },
           },
-        },
-      };
-      const analyzer = new TSAnalyzer(config);
-      it("should return []", () => {
-        expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/ts/simple.ts.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
       });
+
+      describe("when export only file", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: [/[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new TSAnalyzer(config)
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/ts/export-only.ts.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] })
+        })
+      })
     });
   });
 });
