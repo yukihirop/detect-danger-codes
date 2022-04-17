@@ -1,5 +1,3 @@
-import { TSESTree } from "@typescript-eslint/typescript-estree";
-
 /**
  * @description
  *
@@ -46,6 +44,7 @@ export interface ISourcePosition {
 export interface ISourcePositionWithCode extends ISourcePosition {
   filepath: string;
   code: string;
+  matchLine: number;
   endLine: number;
 }
 

@@ -93,12 +93,22 @@ export class JSAnalyzer implements IAnalyzer {
               input.substring(parsedAt.start, parsedAt.end);
           }
 
+          const matchInfoValues = Object.values(item.matchInfo)
+          const matchInfoLines = matchInfoValues.reduce<number[]>((acc, item) => {
+            if (item.line) {
+              acc.push(item.line)
+            }
+            return acc
+          }, [])
+          const matchLine = Math.max(...matchInfoLines)
+
           const result: ISourcePositionWithCode = {
             filepath: path.resolve(process.cwd(), filepath),
             code,
             match: item.match,
             matchInfo: item.matchInfo,
             startLine: item.startLine,
+            matchLine,
             endLine: item.startLine + code.split('\n').length,
             startPosition: start,
             endPosition: end,
