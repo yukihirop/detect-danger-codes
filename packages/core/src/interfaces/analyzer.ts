@@ -31,7 +31,7 @@ export type TSourcePositionMatches = Record<
 
 export type TSourcePositionMatchInfo = Record<
   string,
-  { position: number; line?: number }
+  { position: [number, number]; line?: number, index: number }
 >;
 export interface ISourcePosition {
   match: ISourcePositionMatch;

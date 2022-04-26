@@ -31,8 +31,9 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
+                    index: 0,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                 },
                 startLine: 15,
@@ -76,12 +77,14 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
+                    index: 1,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                   map: {
+                    index: 0,
                     line: 14,
-                    position: 291,
+                    position: [291, 448],
                   },
                 },
                 startLine: 14,
@@ -127,16 +130,19 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Promise.all": {
+                    index: 0,
                     line: 13,
-                    position: 259,
+                    position: [259, 452],
                   },
                   map: {
+                    index: 1,
                     line: 14,
-                    position: 291,
+                    position: [291, 448],
                   },
                   "Task.create": {
+                    index: 2,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                 },
                 startLine: 13,
@@ -182,16 +188,19 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Promise.all": {
+                    index: 0,
                     line: 13,
-                    position: 259,
+                    position: [259, 452],
                   },
                   map: {
+                    index: 1,
                     line: 14,
-                    position: 291,
+                    position: [291, 448],
                   },
                   "/[a-zA-Z]+.create/": {
+                    index: 2,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                 },
                 startLine: 13,
@@ -218,7 +227,7 @@ describe("JSAnalyzer", () => {
         };
         const analyzer = new JSAnalyzer(config);
         it("should return []", () => {
-        const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
+          const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
         });
       });
@@ -234,9 +243,39 @@ describe("JSAnalyzer", () => {
         const analyzer = new JSAnalyzer(config);
         it("should return []", () => {
           const filepath = "./src/__tests__/__fixtures__/js/export-only.js.txt";
-          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] })
-        })
-      })
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
+
+      describe("When the match is a comment", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new JSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/comment.js.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
+
+      describe("when the match is a unnested", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new JSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/unnested.js.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
     });
   });
 });

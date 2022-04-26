@@ -13,8 +13,12 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "eg:js:1": "yarn build && node ./bin/ddc ./examples/js/files/simple.js -c ./examples/js/.ddcrc.js",
     "eg:js:2": "yarn build && node ./bin/ddc ./examples/js/files/export-only.js -c ./examples/js/.ddcrc.js",
+    "eg:js:3": "yarn build && node ./bin/ddc ./examples/js/files/comment.js -c ./examples/js/.ddcrc.js",
+    "eg:js:4": "yarn build && node ./bin/ddc ./examples/js/files/unnested.js -c ./examples/js/.ddcrc.js",
     "eg:ts:1": "yarn build && node ./bin/ddc ./examples/ts/files/simple.ts -c ./examples/ts/.ddcrc.js",
-    "eg:ts:2": "yarn build && node ./bin/ddc ./examples/ts/files/export-only.ts -c ./examples/ts/.ddcrc.js"
+    "eg:ts:2": "yarn build && node ./bin/ddc ./examples/ts/files/export-only.ts -c ./examples/ts/.ddcrc.js",
+    "eg:ts:3": "yarn build && node ./bin/ddc ./examples/ts/files/comment.ts -c ./examples/ts/.ddcrc.js",
+    "eg:ts:4": "yarn build && node ./bin/ddc ./examples/ts/files/unnested.ts -c ./examples/ts/.ddcrc.js"
   },
   "dependencies": {
     "@oclif/command": "^1.8.16",

@@ -31,8 +31,9 @@ describe("TSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
+                    index: 0,
                     line: 25,
-                    position: 586,
+                    position: [586, 724],
                   },
                 },
                 startLine: 25,
@@ -76,12 +77,14 @@ describe("TSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
+                    index: 1,
                     line: 25,
-                    position: 586,
+                    position: [586, 724],
                   },
                   map: {
+                    index: 0,
                     line: 24,
-                    position: 546,
+                    position: [546, 731],
                   },
                 },
                 startLine: 24,
@@ -128,16 +131,19 @@ describe("TSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Promise.all": {
+                    index: 0,
                     line: 22,
-                    position: 490,
+                    position: [490, 736],
                   },
                   map: {
+                    index: 1,
                     line: 24,
-                    position: 546,
+                    position: [546, 731],
                   },
                   "Task.create": {
+                    index: 2,
                     line: 25,
-                    position: 586,
+                    position: [586, 724],
                   },
                 },
                 startLine: 22,
@@ -184,16 +190,19 @@ describe("TSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Promise.all": {
+                    index: 0,
                     line: 22,
-                    position: 490,
+                    position: [490, 736],
                   },
                   map: {
+                    index: 1,
                     line: 24,
-                    position: 546,
+                    position: [546, 731],
                   },
                   "/[a-zA-Z]+.create/": {
+                    index: 2,
                     line: 25,
-                    position: 586,
+                    position: [586, 724],
                   },
                 },
                 startLine: 22,
@@ -239,6 +248,38 @@ describe("TSAnalyzer", () => {
           expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] })
         })
       })
+
+      describe("When the match is a comment", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return []", () => {
+          const filepath =
+            "./src/__tests__/__fixtures__/ts/comment.ts.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
+
+      describe("when the match is a unnested", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new TSAnalyzer(config);
+        it("should return []", () => {
+          const filepath =
+            "./src/__tests__/__fixtures__/ts/unnested.ts.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
     });
   });
 });
