@@ -1,4 +1,4 @@
-import { run as runDDC } from "@detect-danger-codes/core";
+import { run as runDDC, IConfig } from "@detect-danger-codes/core";
 import path from 'path'
 import gitRootDir from "git-root-dir";
 import minimatch from 'minimatch';
@@ -24,7 +24,9 @@ export async function checkDangerCodes(
   const hitLineMap: Record<
     string /* key */,
     Record<string /* file of danger */, Set<number>>
-  > = {};
+    > = {};
+  const absConfigPath = path.resolve(cwd, configPath);
+  const config: IConfig = require(absConfigPath);
 
   for (const file of targetFiles) {
     if (!modifiedLine[file]) {
@@ -42,9 +44,8 @@ export async function checkDangerCodes(
         });
       });
     }
-    const absConfigPath = path.resolve(cwd, configPath);
     const absFilePath = path.resolve(rootDir, file);
-    const result = runDDC(absFilePath, require(absConfigPath));
+    const result = runDDC(absFilePath, config);
     Object.keys(result).forEach((key) => {
       const items = result[key];
       if (!hitLineMap[key]) {
@@ -70,7 +71,8 @@ export async function checkDangerCodes(
   return Object.keys(hitLineMap).reduce<IDDCDangerResult[]>((acc, key) => {
     Object.keys(hitLineMap[key]).forEach((filepath) => {
       hitLineMap[key][filepath].forEach((line) => {
-        acc.push({ key, filepath, line });
+        const description = config.matches[key].description;
+        acc.push({ key, filepath, line, description });
       });
     });
     return acc;
