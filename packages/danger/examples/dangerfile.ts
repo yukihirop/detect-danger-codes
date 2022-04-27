@@ -8,7 +8,7 @@ async function main() {
     '**/*.{js,ts}'
   );
   result.forEach(({ key, filepath, line, description }) => {
-    if (key === "maybeHeabyQuery") {
+    if (key === "maybeHeavyQuery") {
       warn(`
 [ddc|${key}] 🤖 ${description}
 既に退会したユーザーに関するレコードまで取得するようになっていて処理が重くなりお客さんに迷惑をかけたことがありました。
