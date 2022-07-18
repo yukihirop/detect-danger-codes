@@ -69,7 +69,11 @@ export class JSAnalyzer implements IAnalyzer {
         const sourcePosition = sourcePositionMap[key];
         const sorcePositionWithCodes = sourcePosition.reduce<
           ISourcePositionWithCode[]
-        >((childAcc, item) => {
+          >((childAcc, item) => {
+          if (Object.keys(item.matchInfo).length === 0) {
+            return childAcc
+          }
+            
           let parsedAt = this.parseExpressionAt(
             input,
             item.startPosition + item.offsetPosition,
@@ -93,12 +97,23 @@ export class JSAnalyzer implements IAnalyzer {
               input.substring(parsedAt.start, parsedAt.end);
           }
 
+          const matchInfoValues = Object.values(item.matchInfo)
+          const matchInfoLines = matchInfoValues.reduce<number[]>((acc, item) => {
+            if (item.line) {
+              acc.push(item.line)
+            }
+            return acc
+          }, [])
+          const matchLine = Math.max(...matchInfoLines)
+
           const result: ISourcePositionWithCode = {
             filepath: path.resolve(process.cwd(), filepath),
             code,
             match: item.match,
             matchInfo: item.matchInfo,
-            line: item.line,
+            startLine: item.startLine,
+            matchLine,
+            endLine: item.startLine + code.split('\n').length,
             startPosition: start,
             endPosition: end,
             offsetPosition: item.offsetPosition,
@@ -143,8 +158,9 @@ export class JSAnalyzer implements IAnalyzer {
      */
     let isMatch = false;
     let currentPos = 0;
-    const matchInfo: TSourcePositionMatchInfo = {};
-    for (const pattern of match.pattern) {
+    let matchInfo: TSourcePositionMatchInfo = {};
+    for (let i = 0; i < match.pattern.length; i++) {
+      const pattern = match.pattern[i];
       let result: number = -1;
       if (typeof pattern === "string") {
         result = input.indexOf(pattern, currentPos);
@@ -157,25 +173,68 @@ export class JSAnalyzer implements IAnalyzer {
         break;
       } else {
         currentPos = result;
-        matchInfo[pattern.toString()] = { position: currentPos };
+        matchInfo[pattern.toString()] = {
+          position: [currentPos, currentPos],
+          index: i,
+        };
         isMatch = true;
       }
     }
 
     if (!isMatch) return [];
 
+    const inputArr = input.split("\n");
     /**
      * Identify the number of lines from position
      */
     Object.keys(matchInfo).forEach((key) => {
       const pos = matchInfo[key].position;
-      const line = this.lineBy(pos, inputLineVSPos);
-      matchInfo[key].line = line;
+      const line = this.lineBy(pos[0], inputLineVSPos);
+      const code = inputArr[line];
+      const isComment =
+        code.startsWith("//") || code.startsWith("*") || code.startsWith("/*");
+
+      /**
+       * If the line is a comment, remove it from matchInfo
+       */
+      if (isComment) {
+        delete matchInfo[key];
+      } else {
+        const { start, end } = this.parseExpressionAt(
+          input,
+          matchInfo[key].position[0],
+          inputLineVSPos
+        );
+        matchInfo[key].position = [start, end];
+        matchInfo[key].line = line;
+      }
     });
 
-    const inputArr = input.split("\n");
+    /**
+     * If the scope of the first matching block does not contain the next matching block,
+     * matchInfo will be initialized.
+     */
+    const matchInfoKeys = Object.keys(matchInfo);
+    const isMaybeNestedPattern = matchInfoKeys.length > 1;
+    if (isMaybeNestedPattern) {
+      for (let i = 0; i < matchInfoKeys.length - 1; i++) {
+        const firstKey = matchInfoKeys[i];
+        const nextKey = matchInfoKeys[i + 1];
+        const firstMatchData = matchInfo[firstKey];
+        const nextMatchData = matchInfo[nextKey];
+        if (firstMatchData.index < nextMatchData.index) {
+          const firstEndPosition = firstMatchData.position[1];
+          const nextStartPosition = nextMatchData.position[0];
+          if (firstEndPosition < nextStartPosition) {
+            matchInfo = {}
+            break
+          }
+        }
+      }
+    }
+
     let currentEndPosition = 0;
-    return inputArr.reduce((acc, item, index) => {
+    return inputArr.reduce<ISourcePosition[]>((acc, item, index) => {
       const target = match.pattern[0];
 
       let startIndex = -1;
@@ -193,7 +252,7 @@ export class JSAnalyzer implements IAnalyzer {
           acc.push({
             match,
             matchInfo,
-            line: index + 1,
+            startLine: index + 1,
             startPosition: currentEndPosition,
             endPosition:
               currentEndPosition + item.length + this.#NEW_LINE_COUNT,
@@ -203,7 +262,7 @@ export class JSAnalyzer implements IAnalyzer {
         currentEndPosition += item.length + this.#NEW_LINE_COUNT;
       }
       return acc;
-    }, [] as ISourcePosition[]);
+    }, []);
   }
 
   private lineBy(

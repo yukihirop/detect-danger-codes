@@ -1,17 +1,33 @@
 {
-  "name": "@detect-danger-codes/core",
-  "version": "1.0.0",
+  "name": "@yukihirop/detect-danger-codes-core",
+  "version": "1.0.2",
   "main": "dist/index.js",
   "license": "MIT",
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yukihirop/detect-danger-codes.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
-    "build": "node esbuild.js",
+    "clean": "shx rm -rf dist",
+    "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
     "dev": "node --require esbuild-register ./src/index.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "eg:js": "yarn build && node ./bin/ddc ./examples/js/simple.js -c ./examples/js/.ddcrc.js",
-    "eg:ts": "yarn build && node ./bin/ddc ./examples/ts/simple.ts -c ./examples/ts/.ddcrc.js"
+    "eg:js:1": "yarn build && node ./bin/ddc ./examples/js/files/simple.js -c ./examples/js/.ddcrc.js",
+    "eg:js:2": "yarn build && node ./bin/ddc ./examples/js/files/export-only.js -c ./examples/js/.ddcrc.js",
+    "eg:js:3": "yarn build && node ./bin/ddc ./examples/js/files/comment.js -c ./examples/js/.ddcrc.js",
+    "eg:js:4": "yarn build && node ./bin/ddc ./examples/js/files/unnested.js -c ./examples/js/.ddcrc.js",
+    "eg:ts:1": "yarn build && node ./bin/ddc ./examples/ts/files/simple.ts -c ./examples/ts/.ddcrc.js",
+    "eg:ts:2": "yarn build && node ./bin/ddc ./examples/ts/files/export-only.ts -c ./examples/ts/.ddcrc.js",
+    "eg:ts:3": "yarn build && node ./bin/ddc ./examples/ts/files/comment.ts -c ./examples/ts/.ddcrc.js",
+    "eg:ts:4": "yarn build && node ./bin/ddc ./examples/ts/files/unnested.ts -c ./examples/ts/.ddcrc.js",
+    "publish": "yarn build && npm publish --access=public"
   },
   "dependencies": {
     "@oclif/command": "^1.8.16",
@@ -30,11 +46,13 @@
     "esbuild-register": "^3.3.2",
     "jest": "^27.5.1",
     "path-browserify": "^1.0.1",
+    "shx": "^0.3.4",
     "ts-node": "^10.7.0",
     "tsc": "^2.0.4",
+    "tsc-alias": "^1.6.6",
     "typescript": "^4.6.2"
   },
   "engines": {
-    "node": "v17"
+    "node": ">=14.19.0"
   }
 }

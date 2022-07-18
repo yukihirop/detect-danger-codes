@@ -2,8 +2,6 @@ import path from "path";
 import { JSAnalyzer } from "@/analyzers";
 
 describe("JSAnalyzer", () => {
-  const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
-
   describe("analyze", () => {
     describe("when found", () => {
       describe("when `[Task.create]`", () => {
@@ -16,6 +14,7 @@ describe("JSAnalyzer", () => {
         };
         const analyzer = new JSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -32,11 +31,14 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
+                    index: 0,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                 },
-                line: 15,
+                startLine: 15,
+                matchLine: 15,
+                endLine: 21,
                 startPosition: 324,
                 endPosition: 441,
                 offsetPosition: 13,
@@ -56,6 +58,7 @@ describe("JSAnalyzer", () => {
         };
         const analyzer = new JSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -74,15 +77,19 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Task.create": {
+                    index: 1,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                   map: {
+                    index: 0,
                     line: 14,
-                    position: 291,
+                    position: [291, 448],
                   },
                 },
-                line: 14,
+                startLine: 14,
+                matchLine: 15,
+                endLine: 22,
                 startPosition: 291,
                 endPosition: 448,
                 offsetPosition: 19,
@@ -102,6 +109,7 @@ describe("JSAnalyzer", () => {
         };
         const analyzer = new JSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -122,19 +130,24 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Promise.all": {
+                    index: 0,
                     line: 13,
-                    position: 259,
+                    position: [259, 452],
                   },
                   map: {
+                    index: 1,
                     line: 14,
-                    position: 291,
+                    position: [291, 448],
                   },
                   "Task.create": {
+                    index: 2,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                 },
-                line: 13,
+                startLine: 13,
+                matchLine: 15,
+                endLine: 23,
                 startPosition: 259,
                 endPosition: 452,
                 offsetPosition: 8,
@@ -154,6 +167,7 @@ describe("JSAnalyzer", () => {
         };
         const analyzer = new JSAnalyzer(config);
         it("should return [{ filepath, code, match, matchInfo, line, startPosition, endPosition, offsetPosition }]", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
           expect(analyzer.analyze(filepath)).toStrictEqual({
             test: [
               {
@@ -174,19 +188,24 @@ describe("JSAnalyzer", () => {
                 },
                 matchInfo: {
                   "Promise.all": {
+                    index: 0,
                     line: 13,
-                    position: 259,
+                    position: [259, 452],
                   },
                   map: {
+                    index: 1,
                     line: 14,
-                    position: 291,
+                    position: [291, 448],
                   },
                   "/[a-zA-Z]+.create/": {
+                    index: 2,
                     line: 15,
-                    position: 324,
+                    position: [324, 441],
                   },
                 },
-                line: 13,
+                startLine: 13,
+                matchLine: 15,
+                endLine: 23,
                 startPosition: 259,
                 endPosition: 452,
                 offsetPosition: 8,
@@ -198,16 +217,64 @@ describe("JSAnalyzer", () => {
     });
 
     describe("when do not found", () => {
-      const config = {
-        matches: {
-          test: {
-            pattern: ["do", "not", "exists"],
+      describe("when do not match pattern", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["do", "not", "exists"],
+            },
           },
-        },
-      };
-      const analyzer = new JSAnalyzer(config);
-      it("should return []", () => {
-        expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        };
+        const analyzer = new JSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/simple.js.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
+
+      describe("when export only file", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: [/[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new JSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/export-only.js.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
+
+      describe("When the match is a comment", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new JSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/comment.js.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
+      });
+
+      describe("when the match is a unnested", () => {
+        const config = {
+          matches: {
+            test: {
+              pattern: ["Promise.all", "map", /[a-zA-Z]+.create/],
+            },
+          },
+        };
+        const analyzer = new JSAnalyzer(config);
+        it("should return []", () => {
+          const filepath = "./src/__tests__/__fixtures__/js/unnested.js.txt";
+          expect(analyzer.analyze(filepath)).toStrictEqual({ test: [] });
+        });
       });
     });
   });

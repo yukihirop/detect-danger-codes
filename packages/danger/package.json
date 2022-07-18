@@ -1,0 +1,39 @@
+{
+  "name": "@yukihirop/detect-danger-codes-danger",
+  "version": "1.0.2",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yukihirop/detect-danger-codes.git",
+    "directory": "packages/danger"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "scripts": {
+    "clean": "shx rm -rf dist",
+    "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
+    "danger:pr": "cd examples && danger pr https://github.com/yukihirop/detect-danger-codes/pull/5",
+    "publish": "yarn build && npm publish --access=public",
+    "test": "exit 0"
+  },
+  "devDependencies": {
+    "@types/minimatch": "^3.0.5",
+    "danger": "^11.0.2",
+    "esbuild": "^0.14.34",
+    "esbuild-plugin-alias": "^0.2.1",
+    "shx": "^0.3.4",
+    "tsc-alias": "^1.6.6"
+  },
+  "engines": {
+    "node": "v17"
+  },
+  "dependencies": {
+    "git-root-dir": "^1.0.2",
+    "minimatch": "^5.0.1"
+  }
+}
