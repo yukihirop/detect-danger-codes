@@ -18,7 +18,8 @@
     "clean": "shx rm -rf dist",
     "build": "yarn clean && node esbuild.js && tsc --emitDeclarationOnly && tsc-alias",
     "danger:pr": "cd examples && danger pr https://github.com/yukihirop/detect-danger-codes/pull/5",
-    "publish": "yarn build && npm publish --access=public"
+    "publish": "yarn build && npm publish --access=public",
+    "test": "exit 0"
   },
   "devDependencies": {
     "@types/minimatch": "^3.0.5",
