@@ -45,8 +45,7 @@ export async function checkDangerCodes(
       });
     }
     const absFilePath = path.resolve(rootDir, file);
-    const resultStr = runDDC(absFilePath, config);
-    const result = JSON.parse(resultStr)
+    const result = runDDC(absFilePath, config);
     Object.keys(result).forEach((key) => {
       const items = result[key];
       if (!hitLineMap[key]) {
