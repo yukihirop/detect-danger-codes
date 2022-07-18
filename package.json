@@ -13,7 +13,13 @@
   "scripts": {
     "build": "yarn workspaces run build",
     "eg:js:1": "yarn workspace @yukihirop/detect-danger-codes-core run eg:js:1",
+    "eg:js:2": "yarn workspace @yukihirop/detect-danger-codes-core run eg:js:2",
+    "eg:js:3": "yarn workspace @yukihirop/detect-danger-codes-core run eg:js:3",
+    "eg:js:4": "yarn workspace @yukihirop/detect-danger-codes-core run eg:js:4",
     "eg:ts:1": "yarn workspace @yukihirop/detect-danger-codes-core run eg:ts:1",
+    "eg:ts:2": "yarn workspace @yukihirop/detect-danger-codes-core run eg:ts:2",
+    "eg:ts:3": "yarn workspace @yukihirop/detect-danger-codes-core run eg:ts:3",
+    "eg:ts:4": "yarn workspace @yukihirop/detect-danger-codes-core run eg:ts:4",
     "test": "yarn workspaces run test"
   },
   "devDependencies": {
