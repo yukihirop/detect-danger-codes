@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 require('../index.js').DDCCli.run()
-  .then(result => result && console.log(result))
+  .then(result => result && console.log(JSON.stringify(result)))
   .catch(err => {
     console.error(err)
     require('@oclif/errors/handle')(err)
