@@ -1,4 +1,4 @@
-import { run as runDDC, IConfig } from "@detect-danger-codes/core";
+import { run as runDDC, IConfig } from "@yukihirop/detect-danger-codes-core";
 import path from 'path'
 import gitRootDir from "git-root-dir";
 import minimatch from 'minimatch';
@@ -45,7 +45,8 @@ export async function checkDangerCodes(
       });
     }
     const absFilePath = path.resolve(rootDir, file);
-    const result = runDDC(absFilePath, config);
+    const resultStr = runDDC(absFilePath, config);
+    const result = JSON.parse(resultStr)
     Object.keys(result).forEach((key) => {
       const items = result[key];
       if (!hitLineMap[key]) {

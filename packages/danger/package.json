@@ -33,6 +33,7 @@
     "node": "v17"
   },
   "dependencies": {
+    "@yukihirop/detect-danger-codes-core": "1.0.4",
     "git-root-dir": "^1.0.2",
     "minimatch": "^5.0.1"
   }
