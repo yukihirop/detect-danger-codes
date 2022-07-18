@@ -1,4 +1,4 @@
-import { run as runDDC, IConfig } from "@detect-danger-codes/core";
+import { run as runDDC, IConfig } from "@yukihirop/detect-danger-codes-core";
 import path from 'path'
 import gitRootDir from "git-root-dir";
 import minimatch from 'minimatch';

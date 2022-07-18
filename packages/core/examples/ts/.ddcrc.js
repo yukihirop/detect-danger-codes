@@ -1,7 +1,7 @@
 module.exports = {
   matches: {
     maybeHeabyQuery: {
-      pattern: ["map", "Task.create"],
+      pattern: ["map", /[a-zA-Z]+.create/],
       // pattern: ['Promise.resolve'],
       description: "maybe heavy query",
     },
